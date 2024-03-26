@@ -72,9 +72,8 @@ async function fetchPage(url: string): Promise<string> {
 }
 
 export async function crawlWebsite(html: string): Promise<[number, any]> {
-    // const textData = await fetchPage(html);
+    const textData = await fetchPage(html);
 
-    const textData = "Hi I am Roopendra"
     extractData(textData);
     const words = textData.split(/\s+/);
 
