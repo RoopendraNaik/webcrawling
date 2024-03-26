@@ -7,51 +7,39 @@ const client = new Client({
 
 const INDEX_NAME = "test"
 
-// export async function indexData(data: string[]): Promise<void> {
-//     await client.index({
-//         INDEX_NAME,
-//         body: { data }
-//     });
-// }
-
-// async function searchDocuments(indexName: string, query: string) {
-//     const body = await client.search({
-//         index: indexName,
-//         body: {
-//             query: {
-//                 match: {
-//                     field_name: query // Replace field_name with the name of the field you want to search
-//                 }
-//             }
-//         }
-//     });
-//     return body.hits.hits;
-// }
-
-// async function deleteDocument(indexName: string, id: string) {
-//     await client.delete({
-//         index: indexName,
-//         id: id
-//     });
-// }
-
-
-export async function searchData(index: string, query: string): Promise<any> {
-    const body = await client.search({
-        index,
-        q: `field_name:${query}`
-    });
-    return body.hits.hits;
-}
-
-export async function bulkData(body: any[]) {
+export async function indexVector(sentence: string, vector: number[]): Promise<[any, any]> {
     try {
-        const data = await client.bulk({
+        const data = await client.index({
             index: INDEX_NAME,
-            body: body.flatMap(doc => [{ index: { _index: INDEX_NAME } }, doc])
+            body: {
+                sentence,
+                vector: vector.slice(0, 3)
+            }
         });
+        console.log(data);
         return [data, null];
     } catch (error) {
+        console.log("Error occured while storing");
+        console.log(error);
+        return [null, error];
+    }
+}
+
+// Retrieve vectors
+export async function retrieveVectors(): Promise<[any, any]> {
+    try {
+        const body = await client.search({
+            index: INDEX_NAME,
+            body: { query: { match_all: {} } }
+        });
+
+        body.hits.hits.forEach((hit: any) => {
+            console.log(hit._source);
+        });
+        return [body.hits.hits, null];
+    } catch (error) {
+        console.log("Error while retrieving");
+        console.log(error);
         return [null, error];
     }
 }

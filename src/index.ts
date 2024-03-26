@@ -1,21 +1,18 @@
 import express from 'express';
-import { crawlWebsite } from './crawler';
-import { searchData } from './elasticsearch';
+import { crawlWebsite, queryData } from './crawler';
 
 const app = express();
 const port = 3000;
 
 app.get('/crawl', async (req, res) => {
     const url = req.query.url as string;
-    const data = await crawlWebsite(url);
-    // await indexData('web_data', data);
-    res.send('Data crawled and indexed successfully!');
+    const [status, data] = await crawlWebsite(url);
+    res.status(status).send(data);;
 });
 
 app.get('/search', async (req, res) => {
-    const query = req.query.query as string;
-    const results = await searchData('web_data', query);
-    res.json(results);
+    const [status, data] = await queryData()
+    res.status(status).send(data);
 });
 
 app.listen(port, () => {
