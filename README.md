@@ -34,6 +34,7 @@ This is a repository is about fetching texual data via web crawling, converting 
 - you can replace those creds if you want to use your own vectorDB in elasticsearch
 - extractData can be extended to many other data types(urls, text, images and all)
 - There isn't much of a structure used for storing data current text and respective vector is being stored, can extended it to store metaData
+- Storing vectors is happening 1 by 1, improve this to store multiple
 
 # Note
 
