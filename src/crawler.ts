@@ -42,10 +42,8 @@ function extractData(html: string): void {
             try {
                 let text = '';
 
-                // Extract text from the current element
                 text += element.text().trim() + ' ';
 
-                // Recursively extract text from child elements
                 element.children().each((_index: any, child: any) => {
                     text += extractTextFromElement($(child));
                 });
@@ -72,40 +70,44 @@ async function fetchPage(url: string): Promise<string> {
 }
 
 export async function crawlWebsite(html: string): Promise<[number, any]> {
-    const textData = await fetchPage(html);
+    try {
+        const textData = await fetchPage(html);
 
-    extractData(textData);
-    const words = textData.split(/\s+/);
+        extractData(textData);
+        const words = textData.split(/\s+/);
 
-    const sentenses = [];
-    for (let i = 0; i < words.length; i += 10) {
-        sentenses.push(words.slice(i, i + 10).join(' '));
-    }
-
-    console.log(words.length);
-
-    console.log(sentenses);
-    console.log(sentenses.length);
-
-    const success = [""];
-    const failures = [""]
-    for (let i = 0; i < sentenses.length; i++) {
-        const sentense = sentenses[i];
-        const vectorizedData: number[] = await textToVector(sentense);
-        if (i === 0) {
-            console.log("i===0");
-            console.log(vectorizedData.length);
-            console.log(sentenses)
+        const sentenses = [];
+        for (let i = 0; i < words.length; i += 10) {
+            sentenses.push(words.slice(i, i + 10).join(' '));
         }
 
-        const [data, err] = await indexVector(sentense, vectorizedData);
-        if (!data || err) failures.push(data);
-        success.push(data);
+        console.log(words.length);
+
+        console.log(sentenses);
+        console.log(sentenses.length);
+
+        const success = [""];
+        const failures = [""]
+        for (let i = 0; i < sentenses.length; i++) {
+            const sentense = sentenses[i];
+            const vectorizedData: number[] = await textToVector(sentense);
+            if (i === 0) {
+                console.log("i===0");
+                console.log(vectorizedData.length);
+                console.log(sentenses)
+            }
+
+            const [data, err] = await indexVector(sentense, vectorizedData);
+            if (!data || err) failures.push(data);
+            success.push(data);
+        }
+        return [200, {
+            failures,
+            success
+        }]
+    } catch (error) {
+        return [500, error];
     }
-    return [200, {
-        failures,
-        success
-    }]
 }
 
 export async function queryData(): Promise<[number, any]> {

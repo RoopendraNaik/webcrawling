@@ -13,7 +13,7 @@ export async function indexVector(sentence: string, vector: number[]): Promise<[
             index: INDEX_NAME,
             body: {
                 sentence,
-                vector: vector.slice(0, 3)
+                vector: vector.slice(0, 3) // Vector array has 512 elements not storing the whole thing because of limit and time constraints
             }
         });
         console.log(data);
