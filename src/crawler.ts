@@ -69,14 +69,15 @@ async function fetchPage(url: string): Promise<string> {
     return response.data;
 }
 
-export async function crawlWebsite(html: string): Promise<[number, any]> {
+export async function crawlWebsite(url: string): Promise<[number, any]> {
     try {
-        const textData = await fetchPage(html);
+        const textData = await fetchPage(url);
 
         extractData(textData);
         const words = textData.split(/\s+/);
 
-        const sentenses = [];
+        const sentenses: string[] = [];
+        // creating sentenses with 10 words
         for (let i = 0; i < words.length; i += 10) {
             sentenses.push(words.slice(i, i + 10).join(' '));
         }
@@ -86,25 +87,26 @@ export async function crawlWebsite(html: string): Promise<[number, any]> {
         console.log(sentenses);
         console.log(sentenses.length);
 
-        const success = [""];
-        const failures = [""]
-        for (let i = 0; i < sentenses.length; i++) {
-            const sentense = sentenses[i];
-            const vectorizedData: number[] = await textToVector(sentense);
-            if (i === 0) {
-                console.log("i===0");
-                console.log(vectorizedData.length);
-                console.log(sentenses)
-            }
+        process.nextTick(async () => {
+            const success = [];
+            const failures = []
+            for (let i = 0; i < sentenses.length; i++) {
+                const sentense = sentenses[i];
+                const vectorizedData: number[] = await textToVector(sentense);
+                if (i === 0) {
+                    console.log("i===0");
+                    console.log(vectorizedData.length);
+                    console.log(sentenses)
+                }
 
-            const [data, err] = await indexVector(sentense, vectorizedData);
-            if (!data || err) failures.push(data);
-            success.push(data);
-        }
-        return [200, {
-            failures,
-            success
-        }]
+                const [data, err] = await indexVector(url, sentense, vectorizedData);
+                if (!data || err) failures.push(data);
+                success.push(data);
+            }
+            console.log("success", success);
+            console.log("failures", failures);
+        })
+        return [200, { status: 'OK' }]
     } catch (error) {
         return [500, error];
     }

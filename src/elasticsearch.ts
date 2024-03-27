@@ -7,12 +7,13 @@ const client = new Client({
 
 const INDEX_NAME = "test"
 
-export async function indexVector(sentence: string, vector: number[]): Promise<[any, any]> {
+export async function indexVector(url: string, sentence: string, vector: number[]): Promise<[any, any]> {
     try {
         const data = await client.index({
             index: INDEX_NAME,
             body: {
                 sentence,
+                url,
                 vector: vector.slice(0, 3) // Vector array has 512 elements not storing the whole thing because of limit and time constraints
             }
         });
