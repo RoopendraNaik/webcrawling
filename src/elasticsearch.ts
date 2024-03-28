@@ -5,7 +5,7 @@ const client = new Client({
     }
 });
 
-const INDEX_NAME = "test"
+const INDEX_NAME = "demo"
 
 export async function indexVector(url: string, sentence: string, vector: number[]): Promise<[any, any]> {
     try {
@@ -31,7 +31,11 @@ export async function retrieveVectors(): Promise<[any, any]> {
     try {
         const body = await client.search({
             index: INDEX_NAME,
-            body: { query: { match_all: {} } }
+            body: {
+                query: { match_all: {} },
+                size: 1000,
+                sort: [{ _doc: { order: "desc" } }]
+            }
         });
 
         body.hits.hits.forEach((hit: any) => {
